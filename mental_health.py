@@ -1,17 +1,17 @@
 import streamlit as st
 import spacy
-import subprocess
 from openai import OpenAI
 import tiktoken
 from PIL import Image
-import base64
 
-# Ensure the language model is downloaded
+# Add this line to download the SpaCy model if not already present
 try:
     nlp = spacy.load("en_core_web_sm")
 except OSError:
-    subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
+    from spacy.cli import download
+    download("en_core_web_sm")
     nlp = spacy.load("en_core_web_sm")
+
 
 
 # Initialize SpaCy model for NLP
