@@ -1,0 +1,5 @@
+streamlit
+spacy
+openai
+tiktoken
+Pillow
