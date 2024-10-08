@@ -6,8 +6,7 @@ from PIL import Image
 import base64
 
 # Set your OpenAI API key
-client = OpenAI(api_key='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')
-
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 # Function to count tokens using tiktoken
 def count_tokens(text, model="gpt-3.5-turbo"):
     enc = tiktoken.encoding_for_model(model)
