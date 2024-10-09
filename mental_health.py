@@ -117,12 +117,20 @@ st.markdown('<div class="content">', unsafe_allow_html=True)
 st.markdown('<div class="title">AI Mental Health Coach</div>', unsafe_allow_html=True)
 st.markdown('<div class="intro-text">Share your thoughts or experiences to receive personalized mental health advice.</div>', unsafe_allow_html=True)
 
-# Initialize session state for chat history
+# Initialize session state for chat history and previous response type
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
+if 'previous_response_type' not in st.session_state:
+    st.session_state.previous_response_type = None
 
+# User input and response type selection
 user_input = st.text_area("Enter your thoughts here", height=150)
 response_type = st.selectbox("Select AI Response Type", ["Without Data Science and UX", "With Data Science Only", "With UX Only", "With Both Data Science and UX"])
+
+# Clear chat history if the response type changes
+if response_type != st.session_state.previous_response_type:
+    st.session_state.chat_history = []
+    st.session_state.previous_response_type = response_type
 
 # Handle user input and AI response
 if user_input:
