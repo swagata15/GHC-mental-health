@@ -146,6 +146,7 @@ if user_input:
         st.session_state.user_text = ""
 
 # Display chat history with alternating columns and explanations
+
 for item in st.session_state.chat_history:
     role, text = item[0], item[1]
     cols = st.columns([2, 1, 2]) if role == "user" else st.columns([1, 2, 2])
@@ -155,9 +156,16 @@ for item in st.session_state.chat_history:
         if role == "ai" and len(item) > 2:
             with st.expander("Show More"):
                 st.write(item[2])
-            # Add visual and audio aids for UX scenarios
+            # Add visual and audio aids for UX scenarios with autoplay
             if response_type in ["With UX Only", "With Both Data Science and UX"]:
                 st.image("example2.jpg", caption="Visual Aid", use_column_width=True)  # Replace with your own image path
-                st.audio("example.mp3")  # Replace with your own audio file path
+                audio_html = """
+                <audio autoplay controls>
+                    <source src="example.mp3" type="audio/mp3">
+                    Your browser does not support the audio element.
+                </audio>
+                """
+                st.markdown(audio_html, unsafe_allow_html=True)
 
-st.markdown('</div>', unsafe_allow_html=True)
+
+
