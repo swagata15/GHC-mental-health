@@ -168,4 +168,4 @@ for item in st.session_state.chat_history:
                 st.markdown(audio_html, unsafe_allow_html=True)
 
 
-
+st.markdown(audio_html, unsafe_allow_html=True)
