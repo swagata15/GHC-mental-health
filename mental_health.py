@@ -59,56 +59,47 @@ def generate_ai_response(response_type, user_input):
     ai_response = completion.choices[0].message.content.strip()
     return ai_response
 
-# Function to encode image to base64
-def get_base64_of_bin_file(bin_file):
-    with open(bin_file, 'rb') as f:
-        data = f.read()
-    return base64.b64encode(data).decode()
-
 # Streamlit UI
 st.set_page_config(page_title="AI Mental Health Coach", page_icon=":brain:", layout="wide")
 
-# Custom CSS for background image and other styling
-background_image = get_base64_of_bin_file("welcome2.jpg")
-background_css = f"""
+# Custom CSS for styling without background image
+background_css = """
 <style>
-.stApp {{
-    background: url(data:image/png;base64,{background_image});
-    background-size: cover;
-    background-position: center;
-}}
-.content {{
+.stApp {
+    background: none;
+}
+.content {
     position: relative;
     z-index: 2;
     color: #ff69b4;
-}}
-.title {{
+}
+.title {
     color: #000000;
     font-size: 2.5em;
     font-weight: bold;
     text-align: center;
     margin-bottom: 20px;
-}}
-.intro-text {{
+}
+.intro-text {
     color: #000000;
     text-align: center;
     margin-bottom: 20px;
-}}
-.textbox, .dropdown, .ai-response {{
+}
+.textbox, .dropdown, .ai-response {
     background-color: #ffffff;
     color: #ff69b4;
     padding: 10px;
     border-radius: 5px;
     margin-bottom: 20px;
-}}
-.user-message {{
+}
+.user-message {
     text-align: left;
     color: #ff69b4;
-}}
-.ai-response {{
+}
+.ai-response {
     text-align: right;
     color: #000000;
-}}
+}
 </style>
 """
 
