@@ -42,14 +42,15 @@ def generate_ai_response(response_type, user_input):
         prompt = f"The user seeks support and here is their input: '{user_input}'. Provide a general recommendation."
         explanation = "This response is a general recommendation based on mental well-being principles."
     elif response_type == "With Data Science Only":
-        prompt = f"{customization_info} Based on this input: '{user_input}', provide a data-driven response with quantitative analysis and external resource links. The response should have metrics and numbers and also links the user can review."
+        prompt = f"{customization_info} Based on this input: '{user_input}', provide a data-driven response with quantitative analysis and external resource links. The response should have metrics and numbers and percentages for each suggestion and also links the user can review."
         explanation = "This response leverages the user's work-related interests and conversation history, along with relevant resources."
     elif response_type == "With UX Only":
         prompt = f"The user seeks support and here is their input: '{user_input}'. Provide an empathetic response with visual and sensory elements."
         explanation = "This response focuses on empathetic language and aims to provide comfort with visual and audio aids."
     elif response_type == "With Both Data Science and UX":
         prompt = f"{customization_info} Based on this input: '{user_input}', provide a response that includes both data-driven insights and empathetic language, with links to external resources."
-        explanation = "This response combines data-driven insights with empathetic language, considering user history and online resources."
+        explanation = "This response combines data-driven insights with empathetic language, considering user history and online resources. The response should have metrics and numbers and percentages for each suggestion and also links the user can review."
+        explanation = "This response leverages the user's work-related interests and conversation history, along with relevant resources."
 
     # Get response from OpenAI
     completion = client.chat.completions.create(
