@@ -26,13 +26,12 @@ def count_tokens(text, model="gpt-3.5-turbo"):
     tokens = enc.encode(text)
     return len(tokens)
 
-# Function to generate AI response based on response type
+# Function to generate AI response and explanation based on response type
 def generate_ai_response(response_type, user_input):
     system_message = "You are a mental health coach assistant."
     
     # Check if response type is one that utilizes the dataset
     if response_type in ["With Data Science Only", "With Both Data Science and UX"]:
-        # Extract user-specific details for data science scenarios
         user_info = df.iloc[0]  # Assuming only one user for simplicity
         customization_info = f"User is a {user_info['age']}-year-old {user_info['gender']} who is currently feeling {user_info['emotional_state']}. They previously mentioned: '{user_info['conversation_history']}' and prefer '{user_info['preferred_support_style']}'. They are interested in topics like '{user_info['topics_of_interest']}' and have given feedback that they '{user_info['previous_advice_feedback']}'."
     else:
@@ -41,12 +40,16 @@ def generate_ai_response(response_type, user_input):
     # Create prompt based on response type
     if response_type == "Without Data Science and UX":
         prompt = f"The user seeks support and here is their input: '{user_input}'. Provide a general recommendation."
+        explanation = "This response is a general recommendation based on mental well-being principles."
     elif response_type == "With Data Science Only":
         prompt = f"{customization_info} Based on this input: '{user_input}', provide a data-driven response with quantitative analysis and external resource links."
+        explanation = "This response leverages the user's work-related interests and conversation history, along with relevant resources."
     elif response_type == "With UX Only":
         prompt = f"The user seeks support and here is their input: '{user_input}'. Provide an empathetic response with visual and sensory elements."
+        explanation = "This response focuses on empathetic language and aims to provide comfort without data-driven insights."
     elif response_type == "With Both Data Science and UX":
         prompt = f"{customization_info} Based on this input: '{user_input}', provide a response that includes both data-driven insights and empathetic language, with links to external resources."
+        explanation = "This response combines data-driven insights with empathetic language, considering user history and online resources."
 
     # Get response from OpenAI
     completion = client.chat.completions.create(
@@ -57,7 +60,7 @@ def generate_ai_response(response_type, user_input):
         ]
     )
     ai_response = completion.choices[0].message.content.strip()
-    return ai_response
+    return ai_response, explanation
 
 # Streamlit UI
 st.set_page_config(page_title="AI Mental Health Coach", page_icon=":brain:", layout="wide")
@@ -136,16 +139,21 @@ if user_input:
     if st.button("Send"):
         # Store user message
         st.session_state.chat_history.append(("user", user_input))
-        # Generate and store AI response
-        ai_response = generate_ai_response(response_type, user_input)
-        st.session_state.chat_history.append(("ai", ai_response))
+        # Generate and store AI response along with explanation
+        ai_response, explanation = generate_ai_response(response_type, user_input)
+        st.session_state.chat_history.append(("ai", ai_response, explanation))
         # Clear input box after sending
         st.session_state.user_text = ""
 
-# Display chat history in alternating columns with colored boxes
-for role, text in st.session_state.chat_history:
+# Display chat history with alternating columns and explanations
+for item in st.session_state.chat_history:
+    role, text = item[0], item[1]
     cols = st.columns([2, 1, 2]) if role == "user" else st.columns([1, 2, 2])
     with cols[0] if role == "user" else cols[2]:
         st.markdown(f'<div class="{"user-message" if role == "user" else "ai-response"}">{text}</div>', unsafe_allow_html=True)
+        # Show explanation with "Show More" option for AI responses
+        if role == "ai" and len(item) > 2:
+            with st.expander("Show More"):
+                st.write(item[2])
 
 st.markdown('</div>', unsafe_allow_html=True)
