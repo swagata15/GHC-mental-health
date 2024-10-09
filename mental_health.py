@@ -101,6 +101,14 @@ background_css = f"""
     border-radius: 5px;
     margin-bottom: 20px;
 }}
+.user-message {{
+    text-align: left;
+    color: #ff69b4;
+}}
+.ai-response {{
+    text-align: right;
+    color: #000000;
+}}
 </style>
 """
 
@@ -109,21 +117,28 @@ st.markdown('<div class="content">', unsafe_allow_html=True)
 st.markdown('<div class="title">AI Mental Health Coach</div>', unsafe_allow_html=True)
 st.markdown('<div class="intro-text">Share your thoughts or experiences to receive personalized mental health advice.</div>', unsafe_allow_html=True)
 
-if 'user_text' not in st.session_state:
-    st.session_state.user_text = ""
+# Initialize session state for chat history
+if 'chat_history' not in st.session_state:
+    st.session_state.chat_history = []
 
 user_input = st.text_area("Enter your thoughts here", height=150)
 response_type = st.selectbox("Select AI Response Type", ["Without Data Science and UX", "With Data Science Only", "With UX Only", "With Both Data Science and UX"])
 
+# Handle user input and AI response
 if user_input:
-    st.session_state.user_text = user_input
+    if st.button("Send"):
+        # Store user message
+        st.session_state.chat_history.append(("user", user_input))
+        # Generate and store AI response
+        ai_response = generate_ai_response(response_type, user_input)
+        st.session_state.chat_history.append(("ai", ai_response))
+        # Clear input box after sending
+        st.session_state.user_text = ""
 
-if st.session_state.user_text:
-    if st.button("Get AI Response"):
-        ai_response = generate_ai_response(response_type, st.session_state.user_text)
-        st.markdown(f'<div class="ai-response">AI Response: {ai_response}</div>', unsafe_allow_html=True)
-        if response_type == "With UX Only" or response_type == "With Both Data Science and UX":
-            st.image("example2.jpg", caption="Visual Aid", use_column_width=True)
-            st.audio("example.mp3")
+# Display chat history in alternating columns
+for role, text in st.session_state.chat_history:
+    cols = st.columns([2, 1, 2]) if role == "user" else st.columns([1, 2, 2])
+    with cols[0] if role == "user" else cols[2]:
+        st.markdown(f'<div class="{"user-message" if role == "user" else "ai-response"}">{text}</div>', unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
