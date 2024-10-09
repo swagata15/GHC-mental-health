@@ -1,12 +1,25 @@
 import streamlit as st
-from textblob import TextBlob  # Replace SpaCy with TextBlob for simplicity
 from openai import OpenAI
 import tiktoken
 from PIL import Image
+import pandas as pd
 import base64
+
+# Define a synthetic dataset for one user with enhanced attributes
+data = {
+    'age': [29],
+    'gender': ['male'],
+    'conversation_history': ["I've been experiencing work-related stress lately."],
+    'emotional_state': ["anxious"],
+    'preferred_support_style': ["insightful and data-driven"],
+    'topics_of_interest': ["work-life balance, productivity, mental well-being"],
+    'previous_advice_feedback': ["Finds value in data-backed insights and prefers actionable steps"]
+}
+df = pd.DataFrame(data)
 
 # Set your OpenAI API key
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+
 # Function to count tokens using tiktoken
 def count_tokens(text, model="gpt-3.5-turbo"):
     enc = tiktoken.encoding_for_model(model)
@@ -17,15 +30,25 @@ def count_tokens(text, model="gpt-3.5-turbo"):
 def generate_ai_response(response_type, user_input):
     system_message = "You are a mental health coach assistant."
     
-    if response_type == "Without Data Science and UX":
-        prompt = f"The user is seeking support and here is their input: '{user_input}'. Provide a response without data science and user experience considerations. Do not pose a question just a recommendation."
-    elif response_type == "With Data Science Only":
-        prompt = f"The user is seeking support and here is their input: '{user_input}'. Provide a response with data science considerations only, including quantitative data, examples, and numerical insights. Give links to external resources."
-    elif response_type == "With UX Only":
-        prompt = f"The user is seeking support and here is their input: '{user_input}'. Provide a response with user experience considerations only, including visual aids or empathetic language."
-    elif response_type == "With Both Data Science and UX":
-        prompt = f"The user is seeking support and here is their input: '{user_input}'. Provide a response with both data science and user experience considerations, including quantitative data, examples, numerical insights, visual aids, and empathetic language. Give links to external resources."
+    # Check if response type is one that utilizes the dataset
+    if response_type in ["With Data Science Only", "With Both Data Science and UX"]:
+        # Extract user-specific details for data science scenarios
+        user_info = df.iloc[0]  # Assuming only one user for simplicity
+        customization_info = f"User is a {user_info['age']}-year-old {user_info['gender']} who is currently feeling {user_info['emotional_state']}. They previously mentioned: '{user_info['conversation_history']}' and prefer '{user_info['preferred_support_style']}'. They are interested in topics like '{user_info['topics_of_interest']}' and have given feedback that they '{user_info['previous_advice_feedback']}'."
+    else:
+        customization_info = ""  # No customization needed for other scenarios
 
+    # Create prompt based on response type
+    if response_type == "Without Data Science and UX":
+        prompt = f"The user seeks support and here is their input: '{user_input}'. Provide a general recommendation."
+    elif response_type == "With Data Science Only":
+        prompt = f"{customization_info} Based on this input: '{user_input}', provide a data-driven response with quantitative analysis and external resource links."
+    elif response_type == "With UX Only":
+        prompt = f"The user seeks support and here is their input: '{user_input}'. Provide an empathetic response with visual and sensory elements."
+    elif response_type == "With Both Data Science and UX":
+        prompt = f"{customization_info} Based on this input: '{user_input}', provide a response that includes both data-driven insights and empathetic language, with links to external resources."
+
+    # Get response from OpenAI
     completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -33,7 +56,6 @@ def generate_ai_response(response_type, user_input):
             {"role": "user", "content": prompt}
         ]
     )
-    
     ai_response = completion.choices[0].message.content.strip()
     return ai_response
 
@@ -84,7 +106,6 @@ background_css = f"""
 
 st.markdown(background_css, unsafe_allow_html=True)
 st.markdown('<div class="content">', unsafe_allow_html=True)
-
 st.markdown('<div class="title">AI Mental Health Coach</div>', unsafe_allow_html=True)
 st.markdown('<div class="intro-text">Share your thoughts or experiences to receive personalized mental health advice.</div>', unsafe_allow_html=True)
 
