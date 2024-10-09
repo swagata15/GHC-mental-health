@@ -62,7 +62,7 @@ def generate_ai_response(response_type, user_input):
 # Streamlit UI
 st.set_page_config(page_title="AI Mental Health Coach", page_icon=":brain:", layout="wide")
 
-# Custom CSS for styling without background image
+# Custom CSS for styling messages
 background_css = """
 <style>
 .stApp {
@@ -85,20 +85,28 @@ background_css = """
     text-align: center;
     margin-bottom: 20px;
 }
-.textbox, .dropdown, .ai-response {
+.textbox, .dropdown {
     background-color: #ffffff;
     color: #ff69b4;
     padding: 10px;
     border-radius: 5px;
     margin-bottom: 20px;
 }
+.user-message, .ai-response {
+    padding: 10px;
+    border-radius: 10px;
+    margin: 10px 0;
+}
 .user-message {
-    text-align: left;
-    color: #ff69b4;
+    background-color: #d1e7ff;
+    border: 1px solid #8ab6ff;
+    color: #0a3d91;
 }
 .ai-response {
+    background-color: #e8f5e9;
+    border: 1px solid #a5d6a7;
+    color: #1b5e20;
     text-align: right;
-    color: #000000;
 }
 </style>
 """
@@ -134,7 +142,7 @@ if user_input:
         # Clear input box after sending
         st.session_state.user_text = ""
 
-# Display chat history in alternating columns
+# Display chat history in alternating columns with colored boxes
 for role, text in st.session_state.chat_history:
     cols = st.columns([2, 1, 2]) if role == "user" else st.columns([1, 2, 2])
     with cols[0] if role == "user" else cols[2]:
